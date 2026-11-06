@@ -60,19 +60,20 @@ function NewsForm() {
 
         <div className="mb-3">
           <label className="form-label">Категория</label>
-          <select
-            className="form-select"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Выберите категорию...</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
+            <input
+              type="text"
+              className="form-control"
+              name="category"
+              list="category-list"
+              value={formData.category}
+              onChange={handleChange}
+              required
+              placeholder="Выберите или введите новую..."
+            />
+          <datalist id="category-list">
+            {categories.map(cat => <option key={cat} value={cat} />)}
+          </datalist>
+      </div>
 
         <div className="mb-3">
           <label className="form-label">Автор</label>
