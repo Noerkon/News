@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
-from sqlalchemy import create_engine
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import create_engine, or_
 from sqlalchemy.orm import sessionmaker, Session
 from models import Base, News
 from schemas import NewsCreate, NewsUpdate, NewsResponse
@@ -21,6 +22,15 @@ app = FastAPI(
     description="Лабораторная работа: управление новостями",
     version="1.0.0"
              )
+
+# --- НАСТРОЙКА CORS ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Разрешаем всем (для лабы сойдет, в проде так не делают)
+    allow_credentials=True,
+    allow_methods=["*"],  # Разрешаем все методы (GET, POST, PUT, DELETE)
+    allow_headers=["*"],  # Разрешаем все заголовки
+)
 
 def get_db():
     db = SessionLocal()
@@ -62,7 +72,13 @@ def get_news(
 
     # 2. Поиск по заголовку
     if search:
-        query = query.filter(News.title.contains(search))
+        # Разбиваем строку на слова, игнорируя лишние пробелы
+        words = search.split()
+        if words:
+            # Создаем список условий: "в заголовке есть слово 1 ИЛИ слово 2 ИЛИ ..."
+            conditions = [News.title.ilike(f"%{word}%") for word in words]
+            # Объединяем их через ИЛИ и применяем к запросу
+            query = query.filter(or_(*conditions))
 
     # 3. Сортировка
     # Выбираем колонку, по которой будем сортировать
