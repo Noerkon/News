@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-# 1. Базовая схема (общие поля для всех)
+# 1. Базовая схема
 class NewsBase(BaseModel):
     title: str
     content: str
@@ -9,12 +9,10 @@ class NewsBase(BaseModel):
     author: str
 
 # 2. Схема для создания новости (POST)
-# Клиент присылает только эти поля, id и дату сервер ставит сам
 class NewsCreate(NewsBase):
     pass
 
 # 3. Схема для обновления (PUT)
-# Все поля необязательны, вдруг клиент хочет поменять только заголовок
 class NewsUpdate(BaseModel):
     title: str | None = None
     content: str | None = None
@@ -22,7 +20,6 @@ class NewsUpdate(BaseModel):
     author: str | None = None
 
 # 4. Схема для ответа (GET)
-# Сервер отдаёт всё, включая id, просмотры и дату
 class NewsResponse(NewsBase):
     id: int
     views: int

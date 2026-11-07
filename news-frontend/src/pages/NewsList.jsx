@@ -6,15 +6,12 @@ function NewsList() {
   const [news, setNews] = useState([]);
   const [error, setError] = useState(null);
 
-  // Состояния для фильтров и поиска
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
 
-  // Состояния для сортировки
   const [sortBy, setSortBy] = useState('published_at');
   const [order, setOrder] = useState('desc');
 
-  // Функция загрузки с учетом всех параметров
   const fetchNews = () => {
     const params = {};
     if (search) params.search = search;
@@ -33,7 +30,6 @@ function NewsList() {
       });
   };
 
-  // Загружаем при старте
   useEffect(() => {
     fetchNews();
   }, []);
@@ -57,7 +53,6 @@ function NewsList() {
     setSortBy('published_at');
     setOrder('desc');
 
-    // Запрос без параметров, чтобы вернуть всё
     axios.get('http://127.0.0.1:8000/news')
       .then(response => setNews(response.data))
       .catch(err => console.error(err));

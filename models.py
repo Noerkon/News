@@ -2,10 +2,8 @@ from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
-# Создаем базовый класс для моделей
 Base = declarative_base()
 
-# Описываем таблицу "news"
 class News(Base):
     __tablename__ = "news"  # Название таблицы в базе данных
 

@@ -1,10 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
 
 function Navbar() {
-  // Получаем текущий путь, чтобы подсвечивать активную ссылку
   const location = useLocation();
 
-  // Вспомогательная функция для проверки активной страницы
   const isActive = (path) => location.pathname === path ? 'active' : '';
 
   return (

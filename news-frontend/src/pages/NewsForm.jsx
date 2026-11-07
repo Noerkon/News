@@ -11,14 +11,12 @@ function NewsForm() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // 1. Загружаем категории при открытии формы
   useEffect(() => {
     axios.get('http://127.0.0.1:8000/categories')
       .then(res => setCategories(res.data))
       .catch(err => console.error("Ошибка загрузки категорий", err));
   }, []);
 
-  // 2. Если есть ID, загружаем данные новости для редактирования
   useEffect(() => {
     if (id) {
       axios.get(`http://127.0.0.1:8000/news/${id}`)

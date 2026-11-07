@@ -7,7 +7,6 @@ function NewsDetail() {
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); // Получаем ID из URL
 
-  // Функция загрузки новости
   const fetchNews = () => {
     axios.get(`http://127.0.0.1:8000/news/${id}`)
       .then(res => {
@@ -24,21 +23,18 @@ function NewsDetail() {
     fetchNews();
   }, [id]);
 
-  // Обработчик увеличения просмотров
   const handleView = () => {
     axios.post(`http://127.0.0.1:8000/news/${id}/view`)
       .then(() => {
-        // После успешного запроса обновляем данные на странице
         fetchNews();
       })
       .catch(err => console.error("Ошибка просмотра", err));
   };
 
-  // Красивое форматирование даты из ISO-строки
   const formatDate = (isoString) => {
     if (!isoString) return '';
     const date = new Date(isoString);
-    return date.toLocaleString('ru-RU'); // Выведет в формате ДД.ММ.ГГГГ, ЧЧ:ММ:СС
+    return date.toLocaleString('ru-RU');
   };
 
   if (loading) return <div className="container mt-5"><h3>Загрузка...</h3></div>;

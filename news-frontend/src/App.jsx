@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar'; // <-- Импортируем меню
+import Navbar from './components/Navbar';
 import NewsList from './pages/NewsList';
 import NewsForm from './pages/NewsForm';
 import NewsDetail from './pages/NewsDetail';
@@ -7,9 +7,9 @@ import NewsDetail from './pages/NewsDetail';
 function App() {
   return (
     <>
-      <Navbar /> {/* <-- Добавляем меню сверху */}
+      <Navbar />
 
-      <div className="container"> {/* <-- Оборачиваем страницы в контейнер для отступов */}
+      <div className="container">
         <Routes>
           <Route path="/" element={<NewsList />} />
           <Route path="/create" element={<NewsForm />} />

@@ -6,14 +6,14 @@ from models import Base, News
 from schemas import NewsCreate, NewsUpdate, NewsResponse
 from typing import List
 
-# 1. Подключаемся к базе данных SQLite (файл news.db появится в папке проекта)
+# 1. Подключаемся к базе данных SQLite
 DATABASE_URL = "sqlite:///./news.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
-# 2. Создаём сессию для работы с базой (через неё мы будем читать и писать данные)
+# 2. Создаём сессию для работы с базой
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# 3. Создаём таблицы в базе данных (берёт все классы, унаследованные от Base, и создаёт их)
+# 3. Создаём таблицы в базе данных
 Base.metadata.create_all(bind=engine)
 
 # 4. Создаём само приложение FastAPI
@@ -26,11 +26,11 @@ app = FastAPI(
 # --- НАСТРОЙКА CORS ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Разрешаем всем (для лабы сойдет, в проде так не делают)
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Разрешаем все методы (GET, POST, PUT, DELETE)
-    allow_headers=["*"],  # Разрешаем все заголовки
-)
+    allow_methods=["*"],
+    allow_headers=["*"],
+                  )
 
 def get_db():
     db = SessionLocal()
@@ -44,12 +44,11 @@ def create_news(news: NewsCreate, db: Session = Depends(get_db)):
     """
     Создает новую новость. ID и дата публикации присваиваются автоматически.
     """
-    # Превращаем Pydantic-схему в SQLAlchemy-модель (словарь -> объект базы)
     db_news = News(**news.model_dump())
-    db.add(db_news)          # Добавляем в сессию
-    db.commit()              # Сохраняем в базу
-    db.refresh(db_news)      # Обновляем объект, чтобы получить сгенерированный id
-    return db_news           # FastAPI сам превратит его в JSON по схеме NewsResponse
+    db.add(db_news)
+    db.commit()
+    db.refresh(db_news)
+    return db_news
 
 
 @app.get("/news", response_model=List[NewsResponse], summary="Получить список новостей")
@@ -72,26 +71,21 @@ def get_news(
 
     # 2. Поиск по заголовку
     if search:
-        # Разбиваем строку на слова, игнорируя лишние пробелы
         words = search.split()
         if words:
-            # Создаем список условий: "в заголовке есть слово 1 ИЛИ слово 2 ИЛИ ..."
             conditions = [News.title.ilike(f"%{word}%") for word in words]
-            # Объединяем их через ИЛИ и применяем к запросу
             query = query.filter(or_(*conditions))
 
     # 3. Сортировка
-    # Выбираем колонку, по которой будем сортировать
     if sort_by == "views":
         sort_column = News.views
     else:
-        sort_column = News.published_at  # По умолчанию по дате
+        sort_column = News.published_at
 
-    # Выбираем направление сортировки
     if order == "asc":
         query = query.order_by(sort_column.asc())
     else:
-        query = query.order_by(sort_column.desc())  # По умолчанию по убыванию
+        query = query.order_by(sort_column.desc())
 
     return query.all()
 
@@ -116,10 +110,9 @@ def update_news(news_id: int, news: NewsUpdate, db: Session = Depends(get_db)):
     if db_news is None:
         raise HTTPException(status_code=404, detail="Новость не найдена")
 
-    # Проходимся по переданным полям (исключая те, что не переданы)
     update_data = news.model_dump(exclude_unset=True)
     for key, value in update_data.items():
-        setattr(db_news, key, value)  # Устанавливаем новое значение для атрибута
+        setattr(db_news, key, value)
 
     db.commit()
     db.refresh(db_news)
@@ -130,9 +123,7 @@ def get_categories(db: Session = Depends(get_db)):
     """
     Возвращает список уникальных категорий новостей.
     """
-    # Достаем все категории из базы, убираем дубликаты
     categories = db.query(News.category).distinct().all()
-    # Превращаем список кортежей [('Спорт',), ('Политика',)] в обычный список ['Спорт', 'Политика']
     return [c[0] for c in categories]
 
 
